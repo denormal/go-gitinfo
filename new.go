@@ -4,13 +4,18 @@ import (
 	"os"
 
 	"github.com/denormal/go-gitconfig"
-	"github.com/denormal/go-gittools"
 )
 
+// New returns the GitInfo instance for the current process working directory,
+// or an error if the directory cannot be resolved, or the git executable
+// cannot be found.
 func New() (GitInfo, error) {
 	return NewWithPath("")
 } // New()
 
+// NewWithPath returns the GitInfo instance for the given path, or an error
+// if the path cannot be resolved or the git executable cannot be found. If
+// path is "", NewWithPath examines the current process working directory.
 func NewWithPath(path string) (GitInfo, error) {
 	var _err error
 
@@ -28,18 +33,9 @@ func NewWithPath(path string) (GitInfo, error) {
 		return nil, _err
 	}
 
-	// attempt to extract the working copy root
-	_root, _err := gittools.WorkingCopy(path)
-	if _err != nil {
-		if _err != gittools.MissingWorkingCopyError {
-			return nil, _err
-		}
-	}
-
 	// create the GitInfo instance
 	_info := &gitinfo{
 		config: _config,
-		root:   _root,
 	}
 
 	return _info, nil

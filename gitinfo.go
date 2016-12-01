@@ -2,7 +2,6 @@ package gitinfo
 
 import (
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/denormal/go-gitconfig"
@@ -13,35 +12,71 @@ import (
 //		  https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration
 const _EDITOR = "vi"
 
-// declare the regular expression for matching version strings
-var _VERSION *regexp.Regexp
-
+// GitInfo represents basic information about a git working copy.
 type GitInfo interface {
+	// Commit returns the most recent Commit details for the working
+	// copy. If the GitInfo instance was initialised for a path not within a
+	// working copy, Commit will return nil. An error is returned if there is
+	// a problem determining the commit details.
 	Commit() (Commit, error)
-	Config() gitconfig.Config
+
+	// Config returns the git configuration details for the working copy.
+	// see https://github.com/denormal/go-gitconfig for more details.
+	Config() gitconfig.GitConfig
+
+	// Editor returns the git editor configured for working copy.
 	Editor() string
+
+	// Modified returns true if the working copy has been modified, either
+	// through locally made changes, or untracked files. Modified returns an
+	// error if a problem is encountered determining the modified state.
 	Modified() (bool, error)
+
+	// Path returns the absolute path used to initialised this GitInfo.
+	Path() string
+
+	// Root returns the root directory of the working copy. If the GitInfo
+	// instance was initialised for a path not within a working copy, Root
+	// returns the empty string.
 	Root() string
+
+	// User returns details of the git user for this working copy.
 	User() User
+
+	// Version returns the version string for the installed git executable,
+	// or an error if this cannot be determined.
 	Version() (string, error)
 }
 
 type gitinfo struct {
-	config gitconfig.Config
-	root   string
+	config gitconfig.GitConfig
 }
 
-func (g *gitinfo) Config() gitconfig.Config { return g.config }
-func (g *gitinfo) Root() string             { return g.root }
+// Config returns the git configuration details for the working copy.
+// see https://github.com/denormal/go-gitconfig for more details.
+func (g *gitinfo) Config() gitconfig.GitConfig { return g.config }
 
+// Path returns the absolute path used to initialised this GitInfo.
+func (g *gitinfo) Path() string { return g.config.Path() }
+
+// Root returns the root directory of the working copy. If the GitInfo
+// instance was initialised for a path not within a working copy, Root
+// returns the empty string.
+func (g *gitinfo) Root() string { return g.config.Root() }
+
+// Commit returns the most recent Commit details for the working
+// copy. If the GitInfo instance was initialised for a path not within a
+// working copy, Commit will return nil. An error is returned if there is
+// a problem determining the commit details.
 func (g *gitinfo) Commit() (Commit, error) {
 	// do we have a working copy root?
-	if g.root == "" {
+	_root := g.Root()
+	if _root == "" {
 		return nil, nil
 	}
 
 	// attempt to retrieve the current HEAD commit
-	_bytes, _err := revparse(g.root, "HEAD")
+	_bytes, _err := revparse(_root, "HEAD")
 	if _err != nil {
 		if _err == MissingWorkingCopyError {
 			return nil, nil
@@ -60,6 +95,7 @@ func (g *gitinfo) Commit() (Commit, error) {
 	return newCommit(_commit), nil
 } // Commit()
 
+// Editor returns the git editor configured for working copy.
 func (g *gitinfo) Editor() string {
 	// examine the environment for the editor
 	for _, _env := range []string{"GIT_EDITOR", "EDITOR", "VISUAL"} {
@@ -81,15 +117,19 @@ func (g *gitinfo) Editor() string {
 	}
 } // Editor()
 
+// Modified returns true if the working copy has been modified, either
+// through locally made changes, or untracked files. Modified returns an
+// error if a problem is encountered determining the modified state.
 func (g *gitinfo) Modified() (bool, error) {
 	// if we don't have a working copy root, then we can't determine
 	// the modified status
-	if g.root == "" {
+	_root := g.Root()
+	if _root == "" {
 		return false, MissingWorkingCopyError
 	}
 
 	// attempt to determine the modified status
-	_output, _err := gittools.RunInPath(g.root, "status", "--porcelain")
+	_output, _err := gittools.RunInPath(_root, "status", "--porcelain")
 	if _err != nil {
 		return false, _err
 	}
@@ -105,30 +145,16 @@ func (g *gitinfo) Modified() (bool, error) {
 	return false, nil
 } // Modified()
 
+// User returns details of the git user for this working copy.
 func (g *gitinfo) User() User {
 	return newUser(g.config)
 } // User()
 
+// Version returns the version string for the installed git executable,
+// or an error if this cannot be determined.
 func (g *gitinfo) Version() (string, error) {
-	// attempt to extract the version of the current git executable
-	//		- we don't need to be in a particular directory for this
-	//		  so default to the current directory
-	_bytes, _err := gittools.Run("--version")
-	if _err != nil {
-		return "", _err
-	}
-
-	// attempt to parse the version string
-	//		- we're looking for a dotted sequence of numbers
-	return _VERSION.FindString(string(_bytes)), nil
+	return gittools.Version()
 } // Version()
 
 // ensure gitinfo supports the GitInfo interface
 var _ GitInfo = &gitinfo{}
-
-func init() {
-	// compile the regular expression pattern
-	//		- we're looking for a.c.b numbers
-	//		- this may need to be expanded to include modifiers (e.g. "-dev")
-	_VERSION = regexp.MustCompile("\\d+(\\.\\d+)*")
-} // init()
