@@ -7,34 +7,50 @@ import (
 	"github.com/denormal/go-gitconfig"
 )
 
+// User is the interface representing the git user.
 type User interface {
+	// Name returns the name of the current git user, or the empty string
+	// if no name is configured.
 	Name() string
+
+	// Email returns the e-mail addrdd of the current git user, or the empty
+	// string if no e-mail address is configured.
 	Email() string
 
+	// String() returns a string representation of the git user's name and
+	// e-mail address, or the empty string if neither are defined.
 	String() string
 }
 
+// user is the implementation of the User interface
 type user struct {
 	name  string
 	email string
 }
 
-func newUser(config gitconfig.Config) User {
+// newUser returns the user instance as detailed in the given git configuration
+func newUser(config gitconfig.GitConfig) User {
 	// extract the name & email from the git configuration
 	_name := ""
-	_config := config.Get("user.name")
-	if _config != nil {
-		_name = _config.String()
+	if config != nil {
+		_config := config.Get("user.name")
+		if _config != nil {
+			_name = _config.String()
+		}
 	}
 	_email := ""
-	_config = config.Get("user.email")
-	if _config != nil {
-		_email = _config.String()
+	if config != nil {
+		_config = config.Get("user.email")
+		if _config != nil {
+			_email = _config.String()
+		}
 	}
 
 	return &user{name: _name, email: _email}
 } // newUser()
 
+// Name returns the name of the current git user, or the empty string
+// if no name is configured.
 func (u *user) Name() string {
 	// is the git user name defined in the environment?
 	_n := os.Getenv("GIT_AUTHOR_NAME")
@@ -48,6 +64,8 @@ func (u *user) Name() string {
 	return _n
 } // Name()
 
+// Email returns the e-mail addrdd of the current git user, or the empty
+// string if no e-mail address is configured.
 func (u *user) Email() string {
 	// is the git user e-mail defined in the environment?
 	_e := os.Getenv("GIT_AUTHOR_EMAIL")
@@ -64,6 +82,8 @@ func (u *user) Email() string {
 	return _e
 } // Email()
 
+// String() returns a string representation of the git user's name and
+// e-mail address, or the empty string if neither are defined.
 func (u *user) String() string {
 	_name := u.Name()
 	_email := u.Email()

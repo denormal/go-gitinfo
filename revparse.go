@@ -4,6 +4,8 @@ import (
 	"github.com/denormal/go-gittools"
 )
 
+// revparse executes "git rev-parse" and returns the output, or an error
+// if the execution fails.
 func revparse(path string, args ...string) ([]byte, error) {
 	// ensure we are in a git working copy
 	_is, _err := gittools.IsWorkingCopy(path)
