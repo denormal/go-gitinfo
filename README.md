@@ -20,6 +20,14 @@ if err != nil {
 } else if modified {
     fmt.Printf("%s is modified\n", info.Root())
 }
+
+// what is the head commit hash?
+commit, err := info.Commit()
+if err != nil {
+    panic(err)
+} else if commit != nil {
+    fmt.Printf("%s HEAD is at commit %s\n", info.Root(), commit.Prefix(8))
+}
 ```
 
 For more information see `godoc github.com/denormal/go-gitinfo`.
