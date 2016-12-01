@@ -40,7 +40,7 @@ func newUser(config gitconfig.GitConfig) User {
 	}
 	_email := ""
 	if config != nil {
-		_config = config.Get("user.email")
+		_config := config.Get("user.email")
 		if _config != nil {
 			_email = _config.String()
 		}
