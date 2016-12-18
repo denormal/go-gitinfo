@@ -50,8 +50,13 @@ func TestCommit(t *testing.T) {
 			t.Fatalf("unexpected error from Commit(): %s", _err.Error())
 		}
 		_string := _commit.String()
-		for _i := 0; _i <= len(_string); _i++ {
-			_expected := _string[:_i]
+		for _i := -1; _i <= len(_string)+2; _i++ {
+			_expected := ""
+			if _i >= 0 && _i < len(_string) {
+				_expected = _string[:_i]
+			} else if _i >= len(_string) {
+				_expected = _string
+			}
 			_prefix := _commit.Prefix(_i)
 			if _prefix != _expected {
 				t.Fatalf(
