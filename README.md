@@ -36,18 +36,18 @@ For more information see `godoc github.com/denormal/go-gitinfo`.
 
 `go-gitinfo` can be installed using the standard Go approach:
 
-```go
+```sh
 go install github.com/denormal/go-gitinfo
 ```
 
 `go-gitinfo` also provides a command-line tool for extracting git information:
 
-```go
-go install github.com/denormal/go-gitinfo/cmd/gitinfo"
+```sh
+go install github.com/denormal/go-gitinfo/cmd/gitinfo
 ```
 
 Command help may be assessed using
-```bash
+```sh
 % gitignore --help
 ```
 
