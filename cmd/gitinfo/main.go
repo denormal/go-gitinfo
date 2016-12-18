@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -11,7 +12,7 @@ import (
 
 // define the command version
 const (
-	VERSION = "0.01"
+	VERSION = "0.02"
 	BUILD   = 10
 )
 
@@ -52,12 +53,10 @@ func main() {
 		_err error
 	)
 	if *opt.output != "" {
-		_out, _err = os.Create(*opt.output)
+		_path := filepath.Join(strings.Split(*opt.output, "/")...)
+		_out, _err = os.Create(_path)
 		if _err != nil {
-			fail(1,
-				"%s: error: %s: %s\n",
-				exe(), *opt.output, _err.Error(),
-			)
+			fail(1, "%s: error: %s: %s\n", exe(), _path, _err.Error())
 		}
 		defer _out.Close()
 	}

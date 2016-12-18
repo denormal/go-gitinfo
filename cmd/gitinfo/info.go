@@ -12,7 +12,7 @@ func info() gitinfo.GitInfo {
 	//		- we may use go:generate to compile this tool with a fixed
 	//		  git information if we need to distribute the gitinfo tool
 	//		  without source code
-	if git != nil {
+	if git == nil {
 		git, _ = gitinfo.Here()
 	}
 
