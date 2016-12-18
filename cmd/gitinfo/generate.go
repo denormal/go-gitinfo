@@ -3,11 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"sort"
 	"strings"
 	"time"
 
 	"go/format"
+
+	"github.com/denormal/go-gitinfo"
 )
 
 func generate(file *os.File, m map[string]string, pkg, v string, runtime bool) {
@@ -26,6 +29,11 @@ func generate(file *os.File, m map[string]string, pkg, v string, runtime bool) {
 	for _, _k := range _keys {
 		_map = _map + fmt.Sprintf("%q : %q,\n", _k, m[_k])
 	}
+
+	// determine the import path of go-gitinfo
+	//		- we could hard-code this, but instead we use reflection
+	_ref := reflect.TypeOf((*gitinfo.GitInfo)(nil)).Elem()
+	_import := _ref.PkgPath()
 
 	// should we include runtime checking of the git information?
 	_runtime := ""
@@ -53,7 +61,7 @@ func init() { %s
     }
 }`,
 		tag(true), time.Now().UTC().String(), _cmd,
-		pkg, "github.com/denormal/go-gitinfo",
+		pkg, _import,
 		_runtime, v, v, _map,
 	)
 
