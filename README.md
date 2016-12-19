@@ -46,9 +46,9 @@ go install github.com/denormal/go-gitinfo
 go install github.com/denormal/go-gitinfo/cmd/gitinfo
 ```
 
-Command help may be assessed using
+Command help may be accessed using
 ```sh
-% gitignore --help
+% gitinfo --help
 ```
 
 ## License
