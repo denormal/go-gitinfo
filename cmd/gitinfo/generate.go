@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"reflect"
 	"sort"
@@ -13,7 +14,7 @@ import (
 	"github.com/denormal/go-gitinfo"
 )
 
-func generate(file *os.File, m map[string]string, pkg, v string, runtime bool) {
+func generate(out io.Writer, m map[string]string, pkg, v string, runtime bool) {
 	// extract the command line argument used in this invocation
 	_cmd := strings.Join(os.Args, " ")
 
@@ -71,5 +72,5 @@ func init() { %s
 		panic(_err)
 	}
 
-	fmt.Fprint(file, string(_bytes))
+	fmt.Fprint(out, string(_bytes))
 } // generate()

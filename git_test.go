@@ -9,9 +9,9 @@ import (
 	"github.com/denormal/go-gittools"
 )
 
-var _VERSION *regexp.Regexp
+var _GIT *regexp.Regexp
 
-func TestVersion(t *testing.T) {
+func TestGit(t *testing.T) {
 	// if we don't have git installed, then skip this test
 	if !gittools.HasGit() {
 		t.Skip("git not installed")
@@ -22,12 +22,12 @@ func TestVersion(t *testing.T) {
 	if _err != nil {
 		t.Fatalf("unexpected error from New(): %s", _err.Error())
 	}
-	_version, _err := _info.Version()
+	_version, _err := _info.Git()
 	if _err != nil {
-		t.Fatalf("unexpected Version() error: %s", _err.Error())
+		t.Fatalf("unexpected Git() error: %s", _err.Error())
 	} else if _version == "" {
 		t.Fatalf("unexpected empty git version: %q", _version)
-	} else if !_VERSION.Match([]byte(_version)) {
+	} else if !_GIT.Match([]byte(_version)) {
 		t.Fatalf(
 			"unexpected version; expected dotted-decimal, got %q",
 			_version,
@@ -47,12 +47,12 @@ func TestVersion(t *testing.T) {
 		if _err != nil {
 			t.Fatalf("unexpected error from New(): %s", _err.Error())
 		}
-		_v, _err := _info.Version()
+		_v, _err := _info.Git()
 		if _err != nil {
-			t.Fatalf("unexpected Version() error: %s", _err.Error())
+			t.Fatalf("unexpected Git() error: %s", _err.Error())
 		} else if _version == "" {
 			t.Fatalf("unexpected empty git version: %q", _version)
-		} else if !_VERSION.Match([]byte(_version)) {
+		} else if !_GIT.Match([]byte(_version)) {
 			t.Fatalf(
 				"unexpected version; expected dotted-decimal, got %q",
 				_version,
@@ -64,8 +64,8 @@ func TestVersion(t *testing.T) {
 			)
 		}
 	}
-} // TestVersion()
+} // TestGit()
 
 func init() {
-	_VERSION = regexp.MustCompile("^\\d+(\\.\\d+)*$")
+	_GIT = regexp.MustCompile("^\\d+(\\.\\d+)*$")
 } // init()

@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"sort"
 	"strings"
 )
 
-func display(file *os.File, m map[string]string, short bool, fields []string) {
+func display(out io.Writer, m map[string]string, short bool, fields []string) {
 	// have we been given a list of fields to display?
 	//		- if so, we use the given order
 	if fields == nil {
@@ -54,9 +54,9 @@ func display(file *os.File, m map[string]string, short bool, fields []string) {
 	// output the map entries in field order
 	for _, _f := range _fields {
 		if short {
-			fmt.Fprintf(file, "%s\n", m[_f])
+			fmt.Fprintf(out, "%s\n", m[_f])
 		} else {
-			fmt.Fprintf(file, "%-*s = %s\n", _len, _f, m[_f])
+			fmt.Fprintf(out, "%-*s = %s\n", _len, _f, m[_f])
 		}
 	}
 } // display()

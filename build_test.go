@@ -14,12 +14,12 @@ func TestBuild(t *testing.T) {
 		gitinfo.BRANCH:     "branch",
 		gitinfo.COMMIT:     "commit",
 		gitinfo.EDITOR:     "editor",
+		gitinfo.GIT:        "git",
 		gitinfo.MODIFIED:   "true",
 		gitinfo.PATH:       "path",
 		gitinfo.ROOT:       "root",
 		gitinfo.USER_NAME:  "user.name",
 		gitinfo.USER_EMAIL: "user.email",
-		gitinfo.VERSION:    "version",
 		_NONSENSE:          "nonsense",
 	}
 
@@ -102,14 +102,14 @@ func TestBuild(t *testing.T) {
 			_map[gitinfo.USER_EMAIL], _user.Email(),
 		)
 	}
-	//		- version
-	_version, _err := _git.Version()
+	//		- git version
+	_gitversion, _err := _git.Git()
 	if _err != nil {
-		t.Fatalf("unexpected error in Version(): %s", _err.Error())
-	} else if _version != _map[gitinfo.VERSION] {
+		t.Fatalf("unexpected error in Git(): %s", _err.Error())
+	} else if _gitversion != _map[gitinfo.GIT] {
 		t.Fatalf(
-			"unexpected Version(); expected %q, got %q",
-			_map[gitinfo.VERSION], _version,
+			"unexpected Git(); expected %q, got %q",
+			_map[gitinfo.GIT], _gitversion,
 		)
 	}
 

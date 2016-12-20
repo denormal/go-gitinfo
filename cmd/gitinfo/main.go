@@ -12,7 +12,7 @@ import (
 
 // define the command version
 const (
-	VERSION = "0.02"
+	VERSION = "0.03"
 	BUILD   = 10
 )
 
@@ -68,11 +68,11 @@ func main() {
 	} else if *opt.env {
 		_f = []string{
 			gitinfo.EDITOR,
+			gitinfo.GIT,
 			gitinfo.PATH,
 			gitinfo.ROOT,
 			gitinfo.USER_EMAIL,
 			gitinfo.USER_NAME,
-			gitinfo.VERSION,
 		}
 	} else if *opt.src {
 		_f = []string{
@@ -176,7 +176,7 @@ func init() {
 
 		env: _b("env",
 			"Environment information only; equivalent to\n"+
-				"\t-f editor,path,root,user.*,version.",
+				"\t-f editor,git,path,root,user.*.",
 		),
 		src: _b("src",
 			"Source information only; equivalent to "+

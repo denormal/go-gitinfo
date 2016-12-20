@@ -1,6 +1,7 @@
 package gitinfo
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -50,9 +51,16 @@ type GitInfo interface {
 	// User returns details of the git user for this working copy.
 	User() User
 
-	// Version returns the version string for the installed git executable,
-	// or an error if this cannot be determined.
+	// Deprecated: Version returns the version string for the installed git
+	// executable, or an error if this cannot be determined.
+	//
+	// Version is deprecated and will be removed in a future release. Please
+	// use Git() for extracting the git executable version.
 	Version() (string, error)
+
+	// Git returns the version string for the installed git executable,
+	// or an error if this cannot be determined.
+	Git() (string, error)
 
 	// Map returns the git information as a map of strings.
 	Map() map[string]string
@@ -185,10 +193,25 @@ func (g *gitinfo) User() User {
 	return newUser(g.config)
 } // User()
 
-// Version returns the version string for the installed git executable,
+// Git returns the version string for the installed git executable,
 // or an error if this cannot be determined.
-func (g *gitinfo) Version() (string, error) {
+func (g *gitinfo) Git() (string, error) {
 	return gittools.Version()
+} // Git()
+
+// Deprecated: Version returns the version string for the installed git
+// executable, or an error if this cannot be determined.
+//
+// Version is deprecated and will be removed in a future release. Please
+// use Git() for extracting the git executable version.
+func (g *gitinfo) Version() (string, error) {
+	// warn the user that this method is deprecated
+	fmt.Fprintf(
+		os.Stderr,
+		"gitinfo.Version() is deprecated; please use gitinfo.Git()\n",
+	)
+
+	return g.Git()
 } // Version()
 
 // Map returns the git information as a map of strings.
@@ -199,19 +222,19 @@ func (g *gitinfo) Map() map[string]string {
 		_commit, _   = g.Commit()
 		_modified, _ = g.Modified()
 		_user        = g.User()
-		_version, _  = g.Version()
+		_git, _      = g.Git()
 	)
 
 	// build the map
 	_map := map[string]string{
 		BRANCH:     _branch,
 		EDITOR:     g.Editor(),
+		GIT:        _git,
+		MODIFIED:   strconv.FormatBool(_modified),
 		PATH:       g.Path(),
 		ROOT:       g.Root(),
-		MODIFIED:   strconv.FormatBool(_modified),
 		USER_NAME:  _user.Name(),
 		USER_EMAIL: _user.Email(),
-		VERSION:    _version,
 	}
 
 	// add the commit hash (if known)

@@ -14,7 +14,7 @@ func tag(long bool) string {
 		if _git != nil {
 			// do we have a branch name?
 			_branch, _ := _git.Branch()
-			_strings := []string{}
+			_strings := []string{_tag}
 			if _branch != "" {
 				_strings = append(_strings, _branch)
 			}
@@ -27,18 +27,23 @@ func tag(long bool) string {
 				}
 			}
 
-			// combine the branch and commit
-			_output := strings.Join(_strings, "/")
-
 			// is this checkout modified?
-			if _output != "" {
+			if len(_strings) > 1 {
 				_modified, _ := _git.Modified()
 				if _modified {
-					_output = _output + "+"
+					_last := len(_strings) - 1
+					_strings[_last] = _strings[_last] + "+"
 				}
-
-				_tag = _tag + " " + _output
 			}
+
+			// extract the git version
+			_version, _ := _git.Git()
+			if _version != "" {
+				_strings = append(_strings, "git", "v"+_version)
+			}
+
+			// augment the tag
+			_tag = strings.Join(_strings, " ")
 		}
 	}
 
