@@ -129,7 +129,7 @@ func TestBuild(t *testing.T) {
 	//		- ensure the "nonsense" key is not returned
 	_nonsense, _ok := _got[_NONSENSE]
 	if _ok {
-		t.Fatal(
+		t.Fatalf(
 			"unexpected result from Map(); expected no entry for %q, got %q",
 			_NONSENSE, _nonsense,
 		)
